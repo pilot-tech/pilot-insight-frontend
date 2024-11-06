@@ -36,7 +36,7 @@ const SettingsPage = () => {
         markdown: `${API_URL}/database/populate-md`,
         reset: `${API_URL}/database/reset`,
       };
-
+      
       const response = await fetch(endpoints[operation], {
         method: "POST",
       });
