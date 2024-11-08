@@ -15,24 +15,38 @@ interface Source {
 }
 
 const SourcesList: React.FC<{ sources: Source[] }> = ({ sources }) => {
-  const validSources = sources
-    .filter((source) => source.filepath)
-    .sort((a, b) => (b.score || 0) - (a.score || 0));
+  const sourceMap = new Map<string, Source>();
 
-  if (validSources.length === 0) return null;
+  sources
+    .filter(
+      (source): source is Source & { filepath: string } =>
+        source.filepath !== null
+    )
+    .forEach((source) => {
+      const existingSource = sourceMap.get(source.filepath);
+      if (!existingSource || source.score > existingSource.score) {
+        sourceMap.set(source.filepath, source);
+      }
+    });
+
+  const uniqueSources = Array.from(sourceMap.values()).sort(
+    (a, b) => (b.score || 0) - (a.score || 0)
+  );
+
+  if (uniqueSources.length === 0) return null;
 
   return (
     <div className="mt-2">
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="sources">
           <AccordionTrigger className="text-sm text-gray-500 hover:text-gray-700">
-            View Sources ({validSources.length})
+            View Sources ({uniqueSources.length})
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-2 pt-2">
-              {validSources.map((source, index) => (
+              {uniqueSources.map((source, index) => (
                 <div
-                  key={index}
+                  key={source.filepath}
                   className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded-md"
                 >
                   <Link

@@ -65,7 +65,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       </a>
     ),
     ul: ({ children }: any) => (
-      <ul className="list-disc list-inside my-4 space-y-2">{children}</ul>
+      <ul className="list-disc my-4 space-y-2">{children}</ul>
     ),
     ol: ({ children }: any) => <ol className="my-4 space-y-2">{children}</ol>,
     li: ({ children }: any) => <li className="ml-4">{children}</li>,
@@ -99,7 +99,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   };
 
   return (
-    <div className={`prose prose-sm max-w-none dark:prose-invert ${className}`}>
+    <div className={` max-w-none dark:prose-invert ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={MarkdownComponents}

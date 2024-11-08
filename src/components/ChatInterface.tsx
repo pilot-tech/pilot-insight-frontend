@@ -13,6 +13,7 @@ import { API_URL } from "@/constants";
 import { remark } from "remark";
 import html from "remark-html";
 import SourcesList from "./SourcesList";
+import FeedbackButtons from "./FeedbackButtons";
 
 interface Source {
   filepath: string | null;
@@ -20,6 +21,7 @@ interface Source {
 }
 
 interface ChatMessage {
+  id: string;
   query: string;
   response: string;
   timestamp: number;
@@ -73,6 +75,7 @@ const ChatInterface: React.FC = () => {
       setResponse(contentHtml);
 
       const newMessage: ChatMessage = {
+        id: Date.now().toString(),
         query: query.trim(),
         response: newResponse,
         timestamp: Date.now(),
@@ -91,6 +94,16 @@ const ChatInterface: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFeedback = (messageId: string, isPositive: boolean) => {
+    setChatHistory((prev) =>
+      prev.map((message) =>
+        message.id === messageId
+          ? { ...message, feedback: isPositive ? "positive" : "negative" }
+          : message
+      )
+    );
   };
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
@@ -180,6 +193,10 @@ const ChatInterface: React.FC = () => {
                       {message.sources && (
                         <SourcesList sources={message.sources} />
                       )}
+                      <FeedbackButtons
+                        messageId={message.id}
+                        onFeedback={handleFeedback}
+                      />
                     </div>
                   </div>
                   {index < chatHistory.length - 1 && (
