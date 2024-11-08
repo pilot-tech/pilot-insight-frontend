@@ -20,7 +20,7 @@ const SettingsPage = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/api/auth/signin?callbackUrl=/settings");
+    redirect("/api/auth/signin?callbackUrl=https://insightdocs.netlify.app/settings");
   }
 
   const [loading, setLoading] = useState({

@@ -7,7 +7,7 @@ export default async  function Home() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/api/auth/signin?callbackUrl=/");
+    redirect("/api/auth/signin?callbackUrl=https://insightdocs.netlify.app/");
   }
 
   return (
