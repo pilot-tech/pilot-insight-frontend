@@ -17,6 +17,7 @@ export default async function SignIn() {
     process.env.NODE_ENV == "production" ? "__Host-" : ""
   }next-auth.csrf-token`;
   // eslint-disable-next-line
+  /* @ts-ignore */
   const csrfToken = (await cookieStore.get(csrfTokenCookie))?.value.split("|")[0];
 
   return (
