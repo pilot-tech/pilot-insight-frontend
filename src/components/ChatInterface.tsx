@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, KeyboardEvent, ChangeEvent, useEffect } from "react";
 import axios, { AxiosError } from "axios";
@@ -10,15 +10,25 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import MarkdownRenderer from "./MarkdownRenderer";
 import { API_URL } from "@/constants";
+import { remark } from "remark";
+import html from "remark-html";
+import SourcesList from "./SourcesList";
+
+interface Source {
+  filepath: string | null;
+  score: number;
+}
 
 interface ChatMessage {
   query: string;
   response: string;
   timestamp: number;
+  sources?: Source[];
 }
 
 interface ApiResponse {
   answer: string;
+  sources?: Source[];
 }
 
 const ChatInterface: React.FC = () => {
@@ -28,7 +38,6 @@ const ChatInterface: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
-  // Load chat history from localStorage on component mount
   useEffect(() => {
     const savedHistory = localStorage.getItem("chatHistory");
     if (savedHistory) {
@@ -36,7 +45,6 @@ const ChatInterface: React.FC = () => {
     }
   }, []);
 
-  // Save chat history to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
   }, [chatHistory]);
@@ -60,21 +68,25 @@ const ChatInterface: React.FC = () => {
         }
       );
       const newResponse = res.data.answer || "No response available.";
-      setResponse(newResponse);
+      const processedContent = await remark().use(html).process(newResponse);
+      const contentHtml = processedContent.toString();
+      setResponse(contentHtml);
 
-      // Add new message to chat history
       const newMessage: ChatMessage = {
         query: query.trim(),
         response: newResponse,
         timestamp: Date.now(),
+        sources: res.data.sources,
       };
-      setChatHistory(prev => [newMessage, ...prev]);
+      setChatHistory((prev) => [newMessage, ...prev]);
       setQuery("");
     } catch (err) {
       console.error("Error fetching response:", err);
-      const errorMessage = err instanceof AxiosError
-        ? err.response?.data?.message || "An error occurred while fetching the response."
-        : "An unexpected error occurred.";
+      const errorMessage =
+        err instanceof AxiosError
+          ? err.response?.data?.message ||
+            "An error occurred while fetching the response."
+          : "An unexpected error occurred.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -156,19 +168,18 @@ const ChatInterface: React.FC = () => {
               {chatHistory.map((message, index) => (
                 <div key={message.timestamp} className="space-y-2">
                   <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-gray-500">
-                      Question:
-                    </span>
+                    <span className="text-sm text-gray-500">Question:</span>
                     <p className="text-gray-700 bg-gray-50 rounded-lg p-2">
                       {message.query}
                     </p>
                   </div>
                   <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-gray-500">
-                      Answer:
-                    </span>
+                    <span className="text-sm text-gray-500">Answer:</span>
                     <div className="bg-blue-50 rounded-lg p-2">
                       <MarkdownRenderer content={message.response} />
+                      {message.sources && (
+                        <SourcesList sources={message.sources} />
+                      )}
                     </div>
                   </div>
                   {index < chatHistory.length - 1 && (
