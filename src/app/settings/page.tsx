@@ -12,8 +12,17 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Database, FileUp, RotateCcw } from "lucide-react";
 import { API_URL } from "@/constants";
+import { authOptions } from "@/auth";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-const SettingsPage = () => {
+const SettingsPage = async () => {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/api/auth/signin?callbackUrl=https://insightdocs.netlify.app/settings");
+  }
+
   const [loading, setLoading] = useState({
     confluence: false,
     markdown: false,
