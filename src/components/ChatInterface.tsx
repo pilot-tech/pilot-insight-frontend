@@ -1,11 +1,12 @@
+// ChatInterface.tsx
 "use client";
 
 import React, { useState, KeyboardEvent, ChangeEvent, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Send, Trash2 } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import MarkdownRenderer from "./MarkdownRenderer";
@@ -14,6 +15,8 @@ import { remark } from "remark";
 import html from "remark-html";
 import SourcesList from "./SourcesList";
 import FeedbackButtons from "./FeedbackButtons";
+import { Skeleton } from "./ui/skeleton";
+import SkeletonRenderer from "./MarkdownSkeleton";
 
 interface Source {
   filepath: string | null;
@@ -117,97 +120,106 @@ const ChatInterface: React.FC = () => {
     setQuery(e.target.value);
   };
 
-  const clearHistory = () => {
-    setChatHistory([]);
-    localStorage.removeItem("chatHistory");
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-4 md:p-8">
-      <Card className="mx-auto shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    <div className="flex-1 flex flex-col">
+      <main className="flex-1 p-8">
+        {/* Logo and tagline with loading state */}
+        <div className="max-w-2xl mx-auto text-center mb-12">
+          <h1 className="text-4xl font-bold text-orange-500 mb-4">
             InsightDocs
-          </CardTitle>
-          {chatHistory.length > 0 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={clearHistory}
-              className="text-gray-500 hover:text-red-500"
-              aria-label="Clear history"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
-        </CardHeader>
+          </h1>
+          <p className="text-gray-500">
+            Your AI companion for smarter answers!
+          </p>
+        </div>
 
-        <CardContent className="space-y-4">
-          {/* Query Input Section */}
-          <div className="flex space-x-2">
-            <Input
-              value={query}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyPress}
-              placeholder="Ask a question..."
-              disabled={loading}
-              className="flex-1"
-              aria-label="Query input"
-            />
-            <Button
-              onClick={handleSend}
-              disabled={loading || !query.trim()}
-              size="icon"
-              aria-label="Send message"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+        {/* Error Message */}
+        {error && (
+          <Alert variant="destructive" className="max-w-5xl mx-auto mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-          {/* Error Message */}
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {/* Chat History Section */}
-          <ScrollArea className="h-[600px] rounded-md border p-4">
-            <div className="space-y-6">
-              {chatHistory.map((message, index) => (
-                <div key={message.timestamp} className="space-y-2">
-                  <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-gray-500">Question:</span>
-                    <p className="text-gray-700 bg-gray-50 rounded-lg p-2">
-                      {message.query}
-                    </p>
-                  </div>
-                  <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-gray-500">Answer:</span>
-                    <div className="bg-blue-50 rounded-lg p-2">
-                      <MarkdownRenderer content={message.response} />
-                      {message.sources && (
-                        <SourcesList sources={message.sources} />
-                      )}
-                      <FeedbackButtons
-                        messageId={message.id}
-                        onFeedback={handleFeedback}
-                      />
+        {/* Chat History with loading states */}
+        {(chatHistory.length > 0 || loading) && (
+          <Card className="max-w-5xl mx-auto shadow-none border-none bg-gray-100">
+            <CardContent className="p-4">
+              <ScrollArea className="h-[600px]">
+                <div className="space-y-6">
+                  {loading && (
+                    <div className="space-y-2">
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm text-gray-500">Question:</span>
+                        <Skeleton className="h-4 w-3/4" />
+                      </div>
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm text-gray-500">
+                          Generating response...
+                        </span>
+                        <div className="bg-blue-50 rounded-lg p-2">
+                          <SkeletonRenderer />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  {index < chatHistory.length - 1 && (
-                    <hr className="my-4 border-gray-200" />
                   )}
+
+                  {chatHistory.map((message, index) => (
+                    <div key={message.timestamp} className="space-y-2">
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm text-gray-500">Question:</span>
+                        <p className="text-gray-700 bg-gray-50 rounded-lg p-2">
+                          {message.query}
+                        </p>
+                      </div>
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-sm text-gray-500">Answer:</span>
+                        <div className="bg-blue-50 rounded-lg p-2">
+                          <MarkdownRenderer content={message.response} />
+                          {message.sources && (
+                            <SourcesList sources={message.sources} />
+                          )}
+                          <FeedbackButtons
+                            messageId={message.id}
+                            onFeedback={handleFeedback}
+                          />
+                        </div>
+                      </div>
+                      {index < chatHistory.length - 1 && (
+                        <hr className="my-4 border-gray-200" />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Search input */}
+        <div className="max-w-5xl mx-auto flex gap-2 mb-8">
+          <Input
+            value={query}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyPress}
+            placeholder="Ask anything..."
+            disabled={loading}
+            className="flex-1 p-5 text-xl rounded-2xl bg-gray-200 border-none shadow-lg"
+          />
+
+          <Button
+            onClick={handleSend}
+            disabled={loading || !query.trim()}
+            size="icon"
+            className="bg-orange-500 h-10 w-10 rounded-2xl"
+          >
+            {loading ? (
+              <Loader2 className="animate-spin text-white" />
+            ) : (
+              <Send className="text-white bg-orange-500" />
+            )}
+          </Button>
+        </div>
+      </main>
     </div>
   );
 };

@@ -129,7 +129,7 @@ const SettingsPage = () => {
                 size="lg"
                 className="w-full h-20 text-lg"
                 onClick={() => handleOperation("reset")}
-                disabled={true}
+                disabled={false}
               >
                 {loading.reset ? (
                   <Loader2 className="mr-3 h-6 w-6 animate-spin" />

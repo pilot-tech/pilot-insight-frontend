@@ -1,27 +1,17 @@
+// Sidebar.tsx
 "use client";
+
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-//   Home,
-  Search,
-//   Library,
-//   MessagesSquare,
-  Settings,
-//   HelpCircle,
-  Menu,
-} from "lucide-react";
+import { Search, Settings, Menu } from "lucide-react";
 
 const sidebarItems = [
-  //   { name: 'Home', href: '/', icon: Home },
   { name: "Search", href: "/", icon: Search },
-  //   { name: 'Documentation', href: '/docs', icon: Library },
-  //   { name: 'Chat', href: '/chat', icon: MessagesSquare },
   { name: "Settings", href: "/settings", icon: Settings },
-  //   { name: 'Help', href: '/help', icon: HelpCircle },
 ];
 
 interface SidebarContentProps {
