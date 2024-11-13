@@ -31,8 +31,8 @@ export default async function SignIn() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center justify-center">
-            <div className="bg-blue-100 p-3 rounded-full">
-              <Lock className="h-6 w-6 text-blue-600" />
+            <div className=" bg-orange-500 p-3 rounded-full">
+              <Lock className="h-6 w-6 text-white" />
             </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -59,14 +59,14 @@ export default async function SignIn() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-400 focus:border-r-orange-400 focus:z-10 sm:text-sm"
                 placeholder="Enter your password"
               />
             </div>
             <div>
               <Button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-900"
               >
                 Sign in
               </Button>

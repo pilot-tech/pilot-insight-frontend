@@ -11,7 +11,7 @@ import { Search, Settings, Menu } from "lucide-react";
 
 const sidebarItems = [
   { name: "Search", href: "/", icon: Search },
-  { name: "Settings", href: "/settings", icon: Settings },
+  // { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 interface SidebarContentProps {
