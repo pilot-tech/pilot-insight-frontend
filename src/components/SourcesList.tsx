@@ -39,7 +39,7 @@ const SourcesList: React.FC<{ sources: Source[] }> = ({ sources }) => {
     <div className="mt-2">
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="sources">
-          <AccordionTrigger className="text-sm text-gray-500 hover:text-gray-700">
+          <AccordionTrigger className="text-sm text-gray-500 hover:no-underline hover:text-gray-700">
             View Sources ({uniqueSources.length})
           </AccordionTrigger>
           <AccordionContent>

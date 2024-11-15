@@ -31,7 +31,7 @@ export default async function SignIn() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center justify-center">
-            <div className=" bg-orange-500 p-3 rounded-full">
+            <div className=" bg-[#EB723B] p-3 rounded-full">
               <Lock className="h-6 w-6 text-white" />
             </div>
           </div>
@@ -66,7 +66,7 @@ export default async function SignIn() {
             <div>
               <Button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-900"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#EB723B] hover:bg-[#F4B091] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-900"
               >
                 Sign in
               </Button>

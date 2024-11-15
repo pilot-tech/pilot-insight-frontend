@@ -157,7 +157,7 @@ const ChatInterface: React.FC = () => {
     <div className="flex-1 flex flex-col">
       <main className="flex-1 p-8">
         <div className="max-w-2xl mx-auto text-center mb-12">
-          <h1 className="text-4xl font-bold text-orange-500 mb-4">
+          <h1 className="text-4xl font-bold text-[#EB723B] mb-4">
             InsightDocs
           </h1>
           <p className="text-gray-500">
@@ -191,13 +191,16 @@ const ChatInterface: React.FC = () => {
                     </div>
                     <div className="flex flex-col space-y-1">
                       <span className="text-sm text-gray-500">Answer:</span>
-                      <div className="bg-blue-50 rounded-lg p-2">
+                      <div className="bg-blue-50 rounded-lg ">
                         <MarkdownRenderer content={message.response} />
                         {message.sources && (
                           <SourcesList sources={message.sources} />
                         )}
                         <FeedbackButtons
                           messageId={message.id}
+                          query={message.query}
+                          response={message.response}
+                          sources={message.sources}
                           onFeedback={handleFeedback}
                         />
                       </div>
@@ -238,19 +241,19 @@ const ChatInterface: React.FC = () => {
             onKeyDown={handleKeyPress}
             placeholder="Ask anything..."
             disabled={loading}
-            className="flex-1 p-5 text-xl rounded-2xl bg-gray-200 border-none shadow-lg"
+            className="flex-1 p-5 text-[15px] rounded-lg bg-gray-200 border-none shadow-lg"
           />
 
           <Button
             onClick={handleSend}
             disabled={loading || !query.trim()}
             size="icon"
-            className="bg-orange-500 h-10 w-10 rounded-2xl"
+            className="bg-[#EB723B] hover:bg-[#F4B091] h-10 w-10 rounded-lg"
           >
             {loading ? (
               <Loader2 className="animate-spin text-white" />
             ) : (
-              <Send className="text-white bg-orange-500" />
+              <Send className="text-white hover:bg-[#F4B091]" />
             )}
           </Button>
         </div>
