@@ -21,6 +21,7 @@ import html from "remark-html";
 import SourcesList from "./SourcesList";
 import FeedbackButtons from "./FeedbackButtons";
 import SkeletonRenderer from "./MarkdownSkeleton";
+import getCookie from "@/actions/auth";
 
 interface Source {
   filepath: string | null;
@@ -89,23 +90,38 @@ const ChatInterface: React.FC = () => {
   const handleSend = async (): Promise<void> => {
     if (!query.trim()) return;
 
+    const jwtToken = await getCookie();
+
+    if (!jwtToken?.value) {
+      setError("Authentication token not found");
+      return;
+    }
+
     setLoading(true);
     setResponse("");
     setError("");
     setShouldAutoScroll(true);
 
     try {
-      const res = await axios.post<ApiResponse>(
-        `${API_URL}/query/search`,
-        { query },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            credentials: true,
-          },
-        }
-      );
-      const newResponse = res.data.answer || "No response available.";
+      const res = await fetch(`${API_URL}/query/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${jwtToken.value}`,
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      if (!res.ok) {
+        const errorResponse = await res.json();
+        throw new Error(
+          errorResponse.message ||
+            "An error occurred while fetching the response."
+        );
+      }
+
+      const data: ApiResponse = await res.json();
+      const newResponse = data.answer || "No response available.";
       const processedContent = await remark().use(html).process(newResponse);
       const contentHtml = processedContent.toString();
       setResponse(contentHtml);
@@ -115,18 +131,15 @@ const ChatInterface: React.FC = () => {
         query: query.trim(),
         response: newResponse,
         timestamp: Date.now(),
-        sources: res.data.sources,
+        sources: data.sources,
       };
       setChatHistory((prev) => [...prev, newMessage]);
       setQuery("");
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error fetching response:", err);
-      const errorMessage =
-        err instanceof AxiosError
-          ? err.response?.data?.message ||
-            "An error occurred while fetching the response."
-          : "An unexpected error occurred.";
-      setError(errorMessage);
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred."
+      );
     } finally {
       setLoading(false);
     }

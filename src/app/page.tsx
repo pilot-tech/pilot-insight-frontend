@@ -1,13 +1,13 @@
 import ChatInterface from "@/components/ChatInterface";
-import { authOptions } from "@/auth";
-import { getServerSession } from "next-auth";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  const { isAuthenticated } = getKindeServerSession();
+  const isUserAuthenticated = await isAuthenticated();
 
-  if (!session) {
-    redirect("/api/auth/signin?callbackUrl=https://insightdocs.netlify.app/");
+  if (!isUserAuthenticated) {
+    redirect("/sign-in");
   }
 
   return (
