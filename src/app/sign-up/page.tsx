@@ -26,7 +26,7 @@ export default function SignUpClient() {
             Or{" "}
             <LoginLink
               className="font-medium text-[#EB723B] hover:text-[#F4B091]"
-              postLoginRedirectURL="/dashboard"
+              postLoginRedirectURL="/"
             >
               sign in to your account
             </LoginLink>

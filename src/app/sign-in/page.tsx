@@ -25,7 +25,7 @@ export default function SignInClient() {
             Or{" "}
             <RegisterLink
               className="font-medium text-[#EB723B] hover:text-[#F4B091]"
-              postLoginRedirectURL="/dashboard"
+              postLoginRedirectURL="/"
             >
               create a new account
             </RegisterLink>
