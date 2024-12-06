@@ -1,8 +1,8 @@
+import { redirect } from "next/navigation";
 import ChatInterface from "@/components/ChatInterface";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { redirect } from "next/navigation";
 
-export default async function Home() {
+const Page = async () => {
   const { isAuthenticated } = getKindeServerSession();
   const isUserAuthenticated = await isAuthenticated();
 
@@ -10,9 +10,7 @@ export default async function Home() {
     redirect("/sign-in");
   }
 
-  return (
-    <div className="">
-      <ChatInterface pageType="tech" />
-    </div>
-  );
-}
+  return <ChatInterface pageType="non-tech" />;
+};
+
+export default Page;

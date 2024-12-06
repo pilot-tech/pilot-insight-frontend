@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { API_URL } from "@/constants";
+import getCookie from "@/actions/auth";
 
 interface Source {
   filepath: string | null;
@@ -53,9 +54,16 @@ const FeedbackButtons: React.FC<FeedbackButtonsProps> = ({
       sources,
       timestamp: Date.now(),
     };
+    const jwtToken = await getCookie();
+    console.log(jwtToken);
 
     try {
-      await axios.post(`${API_URL}/database/feedback`, feedbackData);
+      await axios.post(`${API_URL}/database/feedback`, feedbackData, {
+        headers: {
+          Authorization: `Bearer ${jwtToken?.value}`,
+          "Content-Type": "application/json",
+        },
+      });
       setFeedback(newFeedback);
       onFeedback(messageId, isPositive);
     } catch (err) {

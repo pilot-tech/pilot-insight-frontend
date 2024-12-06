@@ -34,6 +34,7 @@ interface ChatMessage {
   response: string;
   timestamp: number;
   sources?: Source[];
+  feedback?: 'positive' | 'negative';
 }
 
 interface ApiResponse {
@@ -41,7 +42,18 @@ interface ApiResponse {
   sources?: Source[];
 }
 
-const ChatInterface: React.FC = () => {
+// Define page types
+type PageType = 'tech' | 'non-tech' | 'general';
+
+interface ChatInterfaceProps {
+  pageType?: PageType;
+  additionalContext?: Record<string, any>;
+}
+
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+  pageType = 'general', 
+  additionalContext = {} 
+}) => {
   const [query, setQuery] = useState<string>("");
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -75,17 +87,22 @@ const ChatInterface: React.FC = () => {
     setShouldAutoScroll(isAtBottom);
   };
 
+  // Modify localStorage key based on page type
+  const getLocalStorageKey = () => {
+    return `chatHistory-${pageType}`;
+  };
+
   useEffect(() => {
-    const savedHistory = localStorage.getItem("chatHistory");
+    const savedHistory = localStorage.getItem(getLocalStorageKey());
     if (savedHistory) {
       setChatHistory(JSON.parse(savedHistory));
       setTimeout(() => scrollToBottom(false), 0);
     }
-  }, []);
+  }, [pageType]);
 
   useEffect(() => {
-    localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-  }, [chatHistory]);
+    localStorage.setItem(getLocalStorageKey(), JSON.stringify(chatHistory));
+  }, [chatHistory, pageType]);
 
   const handleSend = async (): Promise<void> => {
     if (!query.trim()) return;
@@ -103,13 +120,23 @@ const ChatInterface: React.FC = () => {
     setShouldAutoScroll(true);
 
     try {
-      const res = await fetch(`${API_URL}/query/search`, {
+      // Determine API endpoint based on page type
+      const apiEndpoint = 
+        pageType === 'tech' 
+          ? `${API_URL}/query/search` 
+          : `${API_URL}/query/non-tech-search`;
+
+      const res = await fetch(apiEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${jwtToken.value}`,
         },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ 
+          query, 
+          pageType,
+          ...additionalContext 
+        }),
       });
 
       if (!res.ok) {
@@ -166,15 +193,38 @@ const ChatInterface: React.FC = () => {
     setQuery(e.target.value);
   };
 
+  // Dynamically set title and subtitle based on page type
+  const getPageDetails = () => {
+    switch (pageType) {
+      case 'tech':
+        return {
+          title: "InsightDocs Tech",
+          subtitle: "Your AI companion for technical insights!"
+        };
+      case 'non-tech':
+        return {
+          title: "InsightDocs Non-Tech",
+          subtitle: "Exploring knowledge beyond technology!"
+        };
+      default:
+        return {
+          title: "InsightDocs",
+          subtitle: "Your AI companion for smarter answers!"
+        };
+    }
+  };
+
+  const { title, subtitle } = getPageDetails();
+
   return (
     <div className="flex-1 flex flex-col">
       <main className="flex-1 p-8">
         <div className="max-w-2xl mx-auto text-center mb-12">
           <h1 className="text-4xl font-bold text-[#EB723B] mb-4">
-            InsightDocs
+            {title}
           </h1>
           <p className="text-gray-500">
-            Your AI companion for smarter answers!
+            {subtitle}
           </p>
         </div>
 

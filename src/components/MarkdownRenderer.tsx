@@ -1,14 +1,74 @@
-
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import mermaid from "mermaid";
+import { Download } from "lucide-react";
 
 interface MarkdownRendererProps {
   content: string;
   className?: string;
 }
+
+const MermaidDiagram: React.FC<{ chart: string }> = ({ chart }) => {
+  const [svg, setSvg] = React.useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = React.useState(false);
+
+  const downloadSvg = React.useCallback(() => {
+    if (!svg) return;
+
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "mermaid-diagram.svg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [svg]);
+
+  React.useEffect(() => {
+    const initializeMermaid = async () => {
+      if (!isInitialized) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: "default",
+        });
+        setIsInitialized(true);
+      }
+    };
+
+    const renderMermaid = async () => {
+      try {
+        const { svg } = await mermaid.render("mermaid-svg", chart);
+        setSvg(svg);
+      } catch (error) {
+        console.error("Mermaid rendering error:", error);
+        setSvg(null);
+      }
+    };
+
+    initializeMermaid().then(renderMermaid);
+  }, [chart, isInitialized]);
+
+  return svg ? (
+    <div className="relative group">
+      <div
+        className="my-4 p-4 bg-white rounded-lg shadow-md overflow-x-auto border border-gray-200"
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+      <button
+        onClick={downloadSvg}
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-100 hover:bg-gray-200 p-2 rounded-full shadow-md"
+        title="Download SVG"
+      >
+        <Download size={20} className="text-gray-700" />
+      </button>
+    </div>
+  ) : null;
+};
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   content,
@@ -17,6 +77,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   const MarkdownComponents = {
     code({ node, inline, className, children, ...props }: any) {
       const match = /language-(\w+)/.exec(className || "");
+
+      if (!inline && match && match[1] === "mermaid") {
+        return <MermaidDiagram chart={String(children)} />;
+      }
       return !inline && match ? (
         <SyntaxHighlighter
           style={vscDarkPlus}
