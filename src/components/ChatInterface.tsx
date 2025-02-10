@@ -22,6 +22,7 @@ import SourcesList from "./SourcesList";
 import FeedbackButtons from "./FeedbackButtons";
 import SkeletonRenderer from "./MarkdownSkeleton";
 import getCookie from "@/actions/auth";
+import { DeleteIcon } from "lucide-react";
 
 interface Source {
   filepath: string | null;
@@ -77,6 +78,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, [chatHistory, loading]);
+
+  const handleClearHistory = () => {
+    localStorage.removeItem(getLocalStorageKey());
+    setChatHistory([]); // Clears chat history from state
+    alert('Chat history cleared successfully!');
+  };
+
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const target = event.target as HTMLDivElement;
@@ -198,7 +206,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     switch (pageType) {
       case 'tech':
         return {
-          title: "InsightDocs Tech",
+          title: "InsightDocs",
           subtitle: "Your AI companion for technical insights!"
         };
       case 'non-tech':
@@ -254,7 +262,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
                     <div className="flex flex-col space-y-1">
                       <span className="text-sm text-gray-500">Answer:</span>
-                      <div className="bg-blue-50 rounded-lg ">
+                      <div className="bg-blue-50 rounded-lg p-5">
                         <MarkdownRenderer content={message.response} />
                         {message.sources && (
                           <SourcesList sources={message.sources} />
@@ -298,6 +306,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </Card>
 
         <div className="max-w-5xl mx-auto flex gap-2 mb-8">
+
+        <Button
+            onClick={handleClearHistory}
+            disabled={loading}
+            size="icon"
+            className="bg-[#EB723B] hover:bg-[#F4B091] h-10 w-10 rounded-lg"
+          >
+            <DeleteIcon className="text-white" />
+          </Button>
+
           <Input
             value={query}
             onChange={handleInputChange}

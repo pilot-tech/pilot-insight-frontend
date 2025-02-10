@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Search, Settings, Menu, NotepadTextDashedIcon } from "lucide-react";
 
-const sidebarItems = [
-  { name: "Search", href: "/", icon: Search },
+const sidebarItems: any[] = [
+  // { name: "Search", href: "/", icon: Search },
   // { name: "Non-Tech", href: "/non-tech", icon: NotepadTextDashedIcon },
   // { name: "Settings", href: "/settings", icon: Settings },
 ];
