@@ -1,17 +1,43 @@
+"use client";
+
 import ChatInterface from "@/components/ChatInterface";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default async function Home() {
-  const { isAuthenticated } = getKindeServerSession();
-  const isUserAuthenticated = await isAuthenticated();
+export default function Home() {
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(null);
+  const router = useRouter();
 
-  if (!isUserAuthenticated) {
-    redirect("/sign-in");
+  useEffect(() => {
+    const getKindeSession = async () => {
+      try {
+        const res = await fetch("/api/kindeSession");
+        const data = await res.json();
+        setIsUserAuthenticated(data.authenticated);
+      } catch (error) {
+        console.error("Error fetching session:", error);
+      }
+    };
+
+    getKindeSession();
+  }, []);
+
+  useEffect(() => {
+    if (isUserAuthenticated === false) {
+      router.push("/sign-in");
+    }
+  }, [isUserAuthenticated, router]);
+
+  if (isUserAuthenticated === null) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="">
+    <div>
       <ChatInterface pageType="tech" />
     </div>
   );
